@@ -1,0 +1,88 @@
+-- Complaints by Borough This shows which borough has the highest number of complaints.
+SELECT
+    agency,
+    COUNT(*) AS total_service_requests
+FROM
+    `dataanalysis-452323.NYCOpenData.nyc`
+GROUP BY
+    agency
+ORDER BY
+    total_service_requests DESC
+
+LIMIT 1000;
+
+-- Complaints Trend Over Time This will show how complaints change over time.
+SELECT 
+    complaint_type, 
+    COUNT(*) AS complaint_count
+FROM `dataanalysis-452323.NYCOpenData.nyc`
+GROUP BY complaint_type
+ORDER BY complaint_count DESC
+LIMIT 10;
+
+-- Complaints by Borough This shows which borough has the highest number of complaints.
+SELECT 
+    DATE(created_date) AS complaint_date, 
+    COUNT(*) AS complaint_count
+FROM `dataanalysis-452323.NYCOpenData.nyc`
+GROUP BY complaint_date
+ORDER BY complaint_date;
+
+-- Complaints Heatmap by Hour of the Day. This helps identify peak complaint hours in NYC.
+
+SELECT 
+    EXTRACT(HOUR FROM TIMESTAMP(created_date)) AS complaint_hour, 
+    COUNT(*) AS complaint_count
+FROM `dataanalysis-452323.NYCOpenData.nyc`
+GROUP BY complaint_hour
+ORDER BY complaint_hour;
+
+-- Complaints by Submission Channel (Phone, Online, Mobile, etc.) This shows which channels people use the most to submit complaints.
+
+SELECT 
+    open_data_channel_type, 
+    COUNT(*) AS complaint_count
+FROM `dataanalysis-452323.NYCOpenData.nyc`
+GROUP BY open_data_channel_type
+ORDER BY complaint_count DESC;
+
+-- Most Common Complaint Types. Identify the top 10 most frequent complaint types across NYC. This helps pinpoint major city issues.
+
+SELECT 
+    complaint_type, 
+    COUNT(*) AS total_complaints
+FROM `dataanalysis-452323.NYCOpenData.nyc`
+GROUP BY complaint_type
+ORDER BY total_complaints DESC
+LIMIT 10;
+
+--Complaint Trends Over Time. Find monthly trends in complaints to see if certain issues spike during specific times of the year.
+
+SELECT 
+    EXTRACT(YEAR FROM TIMESTAMP(created_date)) AS year,
+    EXTRACT(MONTH FROM TIMESTAMP(created_date)) AS month,
+    COUNT(*) AS total_complaints
+FROM `dataanalysis-452323.NYCOpenData.nyc`
+GROUP BY year, month
+ORDER BY year, month;
+
+-- Average Time Taken to Resolve Complaints. Find out how long it takes to resolve complaints on average per complaint type.
+
+SELECT 
+    complaint_type, 
+    AVG(TIMESTAMP_DIFF(TIMESTAMP(closed_date), TIMESTAMP(created_date), HOUR)) AS avg_resolution_time_hours
+FROM `dataanalysis-452323.NYCOpenData.nyc`
+WHERE created_date IS NOT NULL AND closed_date IS NOT NULL
+GROUP BY complaint_type
+ORDER BY avg_resolution_time_hours DESC
+LIMIT 10;
+
+-- Time-Series Analysis: Complaint Trends by Complaint Type. See how specific complaint types have increased or decreased over time.
+
+SELECT 
+    EXTRACT(YEAR FROM TIMESTAMP(created_date)) AS year, 
+    complaint_type,
+    COUNT(*) AS total_complaints
+FROM `dataanalysis-452323.NYCOpenData.nyc`
+GROUP BY year, complaint_type
+ORDER BY year, total_complaints DESC;
